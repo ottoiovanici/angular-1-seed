@@ -1,5 +1,5 @@
 angular.module('templates', []);
-angular.module('app', ['ui.router', 'templates', 'controllers'])
+angular.module('app', ['ui.router', 'controllers'])
 
 .config(['$stateProvider', '$urlRouterProvider',
   function ($stateProvider, $urlRouterProvider) {

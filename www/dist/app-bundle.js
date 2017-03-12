@@ -1,5 +1,5 @@
 angular.module('templates', []);
-angular.module('app', ['ui.router', 'templates', 'controllers'])
+angular.module('app', ['ui.router', 'controllers'])
 
 .config(['$stateProvider', '$urlRouterProvider',
   function ($stateProvider, $urlRouterProvider) {
@@ -32,7 +32,7 @@ angular.module('app', ['ui.router', 'templates', 'controllers'])
       url: '/second',
       views: {
         'main-page@': {
-          template: '<h1>Something</h1>'
+          template: '<h1>Second</h1>'
         }
       }
     });

@@ -11,15 +11,27 @@ var sh = require('shelljs');
 var connect = require('gulp-connect');
 
 var assets = {
-  scripts: [
-    //'./www/lib/angular-ui-router/release/angular-ui-router.min.js',
+  scripts_dev: [
+    './www/lib/jquery/dist/jquery.js',
+    './www/lib/angular-bootstrap/ui-bootstrap.js',
+    './www/lib/angular-bootstrap/ui-bootstrap-tpls.js',
+    './www/lib/requirejs/require.js',
+    './www/lib/lodash/dist/lodash.js',
+    './www/lib/localforage/dist/localforage.js'
+  ],
+  scripts_prod: [
     './www/lib/jquery/dist/jquery.min.js',
     './www/lib/angular-bootstrap/ui-bootstrap.min.js',
     './www/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
+    './www/lib/requirejs/require.js',
     './www/lib/lodash/dist/lodash.min.js',
     './www/lib/localforage/dist/localforage.min.js'
   ],
-  styles: [
+  styles_dev: [
+    './www/lib/bootstrap/dist/css/bootstrap.css',
+    './www/lib/angular-bootstrap/ui-bootstrap-csp.css'
+  ],
+  styles_prod: [
     './www/lib/bootstrap/dist/css/bootstrap.min.css',
     './www/lib/angular-bootstrap/ui-bootstrap-csp.css'
   ]
@@ -38,16 +50,26 @@ var paths = {
 /*
  Build assets
  */
-gulp.task('assets-scripts', function () {
-  return gulp.src(assets.scripts)
-      .pipe(concat('assets-scripts.js'))
-      .pipe(gulp.dest('./www/dist/'))
+gulp.task('assets-scripts-dev', function () {
+  return gulp.src(assets.scripts_dev)
+  .pipe(concat('assets-scripts.js'))
+  .pipe(gulp.dest('./www/dist/'))
+});
+gulp.task('assets-scripts-prod', function () {
+  return gulp.src(assets.scripts_prod)
+  .pipe(concat('assets-scripts.js'))
+  .pipe(gulp.dest('./www/dist/'))
 });
 
-gulp.task('assets-styles', function () {
-  return gulp.src(assets.styles)
-      .pipe(concat('assets-styles.css'))
-      .pipe(gulp.dest('./www/dist/'))
+gulp.task('assets-styles-dev', function () {
+  return gulp.src(assets.styles_dev)
+  .pipe(concat('assets-styles.css'))
+  .pipe(gulp.dest('./www/dist/'))
+});
+gulp.task('assets-styles-prod', function () {
+  return gulp.src(assets.styles_prod)
+  .pipe(concat('assets-styles.css'))
+  .pipe(gulp.dest('./www/dist/'))
 });
 
 /*
@@ -55,49 +77,63 @@ gulp.task('assets-styles', function () {
  */
 gulp.task('build-views', function () {
   gulp.src(paths.templates)
-      .pipe(templateCache())
-      .pipe(gulp.dest('./www/dist/'))
-      .pipe(connect.reload());
+  .pipe(templateCache())
+  .pipe(gulp.dest('./www/dist/'))
+  .pipe(connect.reload());
 });
 
 /*
  Build app scripts
  */
-gulp.task('build-scripts', function () {
+gulp.task('build-scripts-dev', function () {
   return gulp.src(paths.scripts)
-      .pipe(concat('app-bundle.js'))
-      .pipe(gulp.dest('./www/dist/'))
-      .pipe(connect.reload());
+  .pipe(concat('app-bundle.js'))
+  .pipe(gulp.dest('./www/dist/'))
+  .pipe(connect.reload());
+});
+
+gulp.task('build-scripts-prod', function () {
+  return gulp.src(paths.scripts)
+  .pipe(concat('app-bundle.js'))
+  .pipe(babili({
+      mangle: {
+        keepClassNames: true
+      }
+    }))
+  .pipe(gulp.dest('./www/dist/'))
+  .pipe(connect.reload());
 });
 
 /*
  Build app styles
  */
 gulp.task('sass', function (done) {
-  gulp.src('./scss/app.scss')
-      .pipe(sass({
-        errLogToConsole: true
-      }))
-      .pipe(gulp.dest('./www/css/'))
-      .pipe(minifyCss({
-        keepSpecialComments: 0
-      }))
-      .pipe(rename({extname: '.min.css'}))
-      .pipe(gulp.dest('./www/css/'))
-      .pipe(connect.reload());
+  gulp.src('./scss/**/*.scss')
+  .pipe(sass({
+    errLogToConsole: true
+  }))
+  .pipe(gulp.dest('./www/css/'))
+  .pipe(minifyCss({
+    keepSpecialComments: 0
+  }))
+  .pipe(rename({extname: '.min.css'}))
+  .pipe(gulp.dest('./www/css/'))
+  .pipe(connect.reload());
 //      .on('end', done);
 });
 
 /**
  * Build tasks
  */
-var devBuildAll = ['sass', 'assets-scripts', 'assets-styles', 'build-scripts', 'build-views'];
-gulp.task('dev-build', devBuildAll);
+var devBuild = ['assets-scripts-dev', 'assets-styles-dev', 'build-scripts-dev', 'build-views'];
+gulp.task('dev-build', devBuild);
+var prodBuild = ['assets-scripts-prod', 'assets-styles-prod', 'build-scripts-prod', 'build-views'];
+gulp.task('prod-build', prodBuild);
 
 /**
  * Run development tasks
  */
-var devTasks = ['sass', 'assets-scripts', 'assets-styles', 'watch', 'live-reload-dev'];
+var devTasks = ['sass', 'assets-scripts-dev', 'assets-styles-dev', 'watch', 'live-reload-dev'];
 gulp.task('dev', devTasks);
 gulp.task('default', ['dev']);
 
@@ -106,7 +142,7 @@ gulp.task('default', ['dev']);
  */
 gulp.task('watch', function () {
   gulp.watch(paths.sass, ['sass']);
-  gulp.watch(paths.scripts, ['build-scripts']);
+  gulp.watch(paths.scripts, ['build-scripts-dev']);
   gulp.watch(paths.templates, ['build-views']);
 });
 
@@ -121,18 +157,18 @@ gulp.task('live-reload-dev', function () {
 
 gulp.task('install', ['git-check'], function () {
   return bower.commands.install()
-      .on('log', function (data) {
-        gutil.log('bower', gutil.colors.cyan(data.id), data.message);
-      });
+  .on('log', function (data) {
+    gutil.log('bower', gutil.colors.cyan(data.id), data.message);
+  });
 });
 
 gulp.task('git-check', function (done) {
   if (!sh.which('git')) {
     console.log(
-        '  ' + gutil.colors.red('Git is not installed.'),
-        '\n  Git, the version control system, is required to download Ionic.',
-        '\n  Download git here:', gutil.colors.cyan('http://git-scm.com/downloads') + '.',
-        '\n  Once git is installed, run \'' + gutil.colors.cyan('gulp install') + '\' again.'
+    '  ' + gutil.colors.red('Git is not installed.'),
+    '\n  Git, the version control system, is required to download Ionic.',
+    '\n  Download git here:', gutil.colors.cyan('http://git-scm.com/downloads') + '.',
+    '\n  Once git is installed, run \'' + gutil.colors.cyan('gulp install') + '\' again.'
     );
     process.exit(1);
   }
