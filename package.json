@@ -1,0 +1,22 @@
+{
+  "name": "otto-angular-1-seed",
+  "version": "1.0.0",
+  "description": "pre-A-with-2-canvases",
+  "dependencies": {
+    "bower": "^1.8.0",
+    "gulp": "^3.9.1",
+    "shelljs": "^0.7.7"
+  },
+  "devDependencies": {
+    "babili": "0.0.12",
+    "gulp-angular-templatecache": "^2.0.0",
+    "gulp-babili": "0.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-connect": "^5.0.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-util": "^3.0.8",
+    "through2": "^2.0.3"
+  }
+}

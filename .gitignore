@@ -1,0 +1,45 @@
+# Specifies intentionally untracked files to ignore when using Git
+# http://git-scm.com/docs/gitignore
+
+node_modules/
+platforms/
+plugins/
+
+# Covers JetBrains IDEs:
+*.iml
+
+## Directory-based project format:
+.idea/
+
+## File-based project format:
+*.ipr
+*.iws
+
+## Windows specific
+Thumbs.db
+
+## Plugin-specific files:
+
+# IntelliJ
+/out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Visual Studio
+.vs
+bld/
+bin/
+merges/
+_references.js_bak
+_references.js
+*.jsproj
+*.user
+*.sln
+taco.json
+
+# Individual files:
+.editorconfig
