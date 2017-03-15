@@ -1,0 +1,14 @@
+// Sets the style only for pseudo selectors
+@mixin setLinkStyle {
+  &:link, &:visited {
+    @content;
+  }
+}
+
+footer {
+  a {
+    @include setLinkStyle {
+      color: #fff;
+    }
+  }
+}

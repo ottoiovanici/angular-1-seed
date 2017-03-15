@@ -28,10 +28,12 @@ var assets = {
     './www/lib/localforage/dist/localforage.min.js'
   ],
   styles_dev: [
+    './www/css/main.css',
     './www/lib/bootstrap/dist/css/bootstrap.css',
     './www/lib/angular-bootstrap/ui-bootstrap-csp.css'
   ],
   styles_prod: [
+    './www/css/main.min.css',
     './www/lib/bootstrap/dist/css/bootstrap.min.css',
     './www/lib/angular-bootstrap/ui-bootstrap-csp.css'
   ]
@@ -141,7 +143,7 @@ gulp.task('default', ['dev']);
  * Watches
  */
 gulp.task('watch', function () {
-  gulp.watch(paths.sass, ['sass']);
+  gulp.watch(paths.sass, {emit:'all'}, ['sass']);
   gulp.watch(paths.scripts, ['build-scripts-dev']);
   gulp.watch(paths.templates, ['build-views']);
 });
